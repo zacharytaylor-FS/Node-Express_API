@@ -13,6 +13,7 @@ describe('Customer Test Suite', () => {
   test('As a user I want to create and account', async () => {
     const customer = new Customer({
       "name":"Zachary Taylor",
+      "orderCount": 23,
       "email": "example@example.com",
       "age": 30,
       "living": true

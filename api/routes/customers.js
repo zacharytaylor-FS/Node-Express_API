@@ -8,7 +8,7 @@ const router = express.Router();
 //* GET ALL - show all users
 router.get('/', async (req, res, next) => {
 
-  const doc = await Customer.find({})
+   await Customer.find({})
   .then(users => {
     console.log(users);
     res.status(200).json({
@@ -30,13 +30,17 @@ router.get('/', async (req, res, next) => {
 router.get('/:customerId', (req, res, next) => {
   const customerId = req.params.customerId
 
-  Customer.findOne
-  res.status(200).json({
-    id:customerId,
-
-    message: 'Users - GET by Id',
-    method: req.method,
-    Timestamp: new Date().toLocaleTimeString()
+  Customer.findOne({_id:customerId}).then(result => {
+    res.status(200).json({
+      message: 'Users - GET by Id',
+      customer: result,
+      metadata: {
+        host: req.hostname,
+        method: req.method,
+        Timestamp: new Date().toLocaleTimeString()
+      }
+    })
+    
   })
 });
 //* Create User

@@ -30,14 +30,6 @@ app.get('/', (req,res,next) => {
   })
 });
 
-// app.post('/', (req, res, next) => {
-//   res.status(201).json({
-//     message: 'Root - POST',
-//     method: req.method,
-//     date: new Date().toLocaleString()
-//   })
-// })
-
 //* routes - ROUTER(s)
 app.use('/customers', customerRouter)
 // app.use('/products', productRouter)

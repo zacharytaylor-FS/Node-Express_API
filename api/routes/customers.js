@@ -31,6 +31,7 @@ router.post('/add', (req, res, next) => {
   const living = req.body.living;
 
   const newCustomer = new Customer({
+    // _id: mongoose.Types.ObjectId,
     name: name,
     email: email,
     living: living,
@@ -38,8 +39,21 @@ router.post('/add', (req, res, next) => {
   });
   
   saveEntry(newCustomer)
-    .then((dbCustomer) => {
-      return res.status(200).json({customer: dbCustomer})
+    .then(result => {
+      console.log(result)
+      res.status(200).json({
+        message: "Customer Saved",
+        customer: {
+          name: result.name,
+          email: result.email,
+          age: result.age,
+          living: result.living,
+          metadata: {
+            method: req.method,
+            host: req.hostname
+          }
+        }
+      })
     }).catch(err => {
       res.status(501).json({
         error: {

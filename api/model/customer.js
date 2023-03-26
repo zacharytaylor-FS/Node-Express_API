@@ -13,6 +13,9 @@ const customerSchema = new mongoose.Schema({
     required: true,
     lowercase: true
   },
+  orderCount:{
+    type: Number
+  },
   email: {
     type: String,
     lowercase: true

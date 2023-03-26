@@ -26,13 +26,15 @@ router.get('/:customerId', (req, res, next) => {
 //* Create User
 router.post('/add', (req, res, next) => {
   const name = req.body.name;
+  const orderCount = req.body.orderCount
   const age = req.body.age;
   const email = req.body.email;
   const living = req.body.living;
 
   const newCustomer = new Customer({
-    // _id: mongoose.Types.ObjectId,
+    // _id: mongoose.Schema.Types.ObjectId,
     name: name,
+    orderCount: orderCount,
     email: email,
     living: living,
     age: age
@@ -45,7 +47,9 @@ router.post('/add', (req, res, next) => {
         message: "Customer Saved",
         customer: {
           name: result.name,
+          orderCount: result.orderCount,
           email: result.email,
+          id: result._id,
           age: result.age,
           living: result.living,
           metadata: {
@@ -69,10 +73,12 @@ router.patch('/update/:customerId', (req, res, next) => {
  const customerId = req.params.customerId
 
  const updatedCustomer = {
+  _id: customerId,
   name: req.body.name,
+  orderCount: req.body.orderCount,
   email: req.body.email,
-  living: req.body.living,
   age: req.body.age,
+  living: req.body.living,
  }
 
  Customer.updateOne({
@@ -84,13 +90,16 @@ router.patch('/update/:customerId', (req, res, next) => {
     message: "Updated Customer",
     customer: {
       name: result.name,
+      orderCount: result.orderCount,
       email: result.email,
+      id: result._id,
+      age: result.age,
       living: result.living,
-      age: result.age
     },
     metadata: {
       host: req.hostname,
-      method: req.method
+      method: req.method,
+      Timestamp: new Date().toLocaleTimeString(),
     }
   })
 })
@@ -98,12 +107,26 @@ router.patch('/update/:customerId', (req, res, next) => {
   res.status(500).json({
     error: {
       message: err.message,
+      status: err.status
     }
   })
 });
 })
-router.delete('/:customerId', (req, res, next) => {
- const customerId = req.params.customerId
+router.delete('/delete/:customerId', (req, res, next) => {
+  const customerId = req.params.customerId
+
+Customer.deleteOne({_id:customerId})
+  .then(result => {
+    res.status(200).json({
+      message: "Delete Customer",
+      result: {result},
+      metadata: {
+        host: req.hostname,
+        method: req.method,
+        Timestamp: new Date().toLocaleTimeString(),
+      }
+    })
+  }).catch();
   res.status(200).json({
     id:customerId,
     message: 'Users - DELETE by Id',

@@ -112,6 +112,7 @@ router.patch('/update/:customerId', (req, res, next) => {
   })
 });
 })
+
 router.delete('/delete/:customerId', (req, res, next) => {
   const customerId = req.params.customerId
 
@@ -119,20 +120,19 @@ Customer.deleteOne({_id:customerId})
   .then(result => {
     res.status(200).json({
       message: "Delete Customer",
-      result: {result},
+      success: {result},
       metadata: {
         host: req.hostname,
         method: req.method,
         Timestamp: new Date().toLocaleTimeString(),
       }
     })
-  }).catch();
-  res.status(200).json({
-    id:customerId,
-    message: 'Users - DELETE by Id',
-    method: req.method,
-    Timestamp: new Date().toLocaleTimeString()
-  })
+  }).catch(err => {
+    res.status(500).json({
+      message: err.message,
+      status: err.status
+    })
+  });
 })
 
 module.exports = router

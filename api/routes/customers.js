@@ -6,18 +6,34 @@ const router = express.Router();
 
 
 //* GET ALL - show all users
-router.get('/', (req, res, next) => {
-  res.status(200).json({
-    message: 'Users - GET ALL',
-    method: req.method,
-    Timestamp: new Date().toLocaleTimeString()
-  })
+router.get('/', async (req, res, next) => {
+
+  const doc = await Customer.find({})
+  .then(users => {
+    console.log(users);
+    res.status(200).json({
+      users,
+      message: 'Users - GET ALL',
+      method: req.method,
+      Timestamp: new Date().toLocaleTimeString()
+    })
+  }).catch(err => {
+    res.status(500).json({
+      error: {
+        message: err.message,
+        status: err.status,
+      }
+    })
+  });
 });
 
 router.get('/:customerId', (req, res, next) => {
   const customerId = req.params.customerId
+
+  Customer.findOne
   res.status(200).json({
     id:customerId,
+
     message: 'Users - GET by Id',
     method: req.method,
     Timestamp: new Date().toLocaleTimeString()

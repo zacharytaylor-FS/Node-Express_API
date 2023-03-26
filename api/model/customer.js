@@ -14,7 +14,8 @@ const customerSchema = new mongoose.Schema({
     lowercase: true
   },
   orderCount:{
-    type: Number
+    type: Number,
+    max: 100
   },
   email: {
     type: String,
@@ -34,5 +35,15 @@ const customerSchema = new mongoose.Schema({
     default: Date.now
   }
   });
+
+  customerSchema.pre('find', () => {
+    console.log(this instanceof mongoose.Query);
+    this.start = Date.now()
+  });
+
+  customerSchema.post('find', (result) => {
+    console.log('find() returned ' + JSON.stringify(result))
+    console.log('find() took ' + (Date.now() - this.start) + 'milliseconds')
+  })
 
   module.exports = mongoose.model('Customer', customerSchema)

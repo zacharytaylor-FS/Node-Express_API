@@ -38,7 +38,7 @@ const customerSchema = new mongoose.Schema({
 
   customerSchema.pre('find', () => {
     console.log(this instanceof mongoose.Query);
-    this.start = Date.now()
+    return this.start = Date.now()
   });
 
   customerSchema.post('find', (result) => {

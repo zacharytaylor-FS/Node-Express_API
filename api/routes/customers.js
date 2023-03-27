@@ -5,6 +5,7 @@ const Customer = require('../model/customer')
 const router = express.Router();
 
 
+
 //* GET ALL - show all users
 router.get('/', async (req, res, next) => {
 

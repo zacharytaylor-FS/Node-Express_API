@@ -8,10 +8,27 @@ const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
   _customerId: mongoose.Schema.Types.ObjectId,
-  name:{
+  fName:{
     type: String,
     required: true,
     lowercase: true
+  },
+  lName:{
+    type: String,
+    required: true,
+    lowercase: true
+  },
+  address: {
+    type: String
+  },
+  city: {
+    type: String
+  },
+  zipcode: {
+    type: String
+  },
+  phone: {
+    type: String
   },
   orderCount:{
     type: Number,

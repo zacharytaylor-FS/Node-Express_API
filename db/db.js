@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
+
 const connect = async (req,res) => {
-  console.log('MongoDB is up and running!')
-  return await mongoose.connect(process.env.MONGODB)
+  return await mongoose.connect(process.env.MONGODB),
+  console.log("MongoDB is up and running!")
 };
 
 const saveEntry = async (newEntry) => {
+  return await newEntry.save(),
   console.log('Saving New Entry');
-  return await newEntry.save();
 }
 
 const disconnect = () => {
+  return mongoose.connection.close(),
   console.log('Real Disconnect');
-  return mongoose.connection.close()
 }
 module.exports = {connect, saveEntry, disconnect}

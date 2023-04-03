@@ -25,7 +25,7 @@ const customerSchema = new mongoose.Schema({
     type: String
   },
   zipcode: {
-    type: String
+    type: Number
   },
   phone: {
     type: String

@@ -25,7 +25,7 @@ router.get('/:id', (req, res, next) => {
 //* Create User
 router.post('/add', (req, res, next) => {
   const name = req.body.name;
-  const manfacture = req.body.manufacture;
+  const manufacture = req.body.manufacture;
   const type = req.body.type;
   const sold = req.body.sold;
 
@@ -33,7 +33,7 @@ router.post('/add', (req, res, next) => {
     name: name,
     type: type,
     sold: sold,
-    manufacture: manfacture
+    manufacture: manufacture
   });
   
   saveEntry(newProduct)
@@ -43,7 +43,7 @@ router.post('/add', (req, res, next) => {
       res.status(501).json({
         error: {
           message: err.message,
-          stauts: err.status
+          status: err.status
         }
       })
     })

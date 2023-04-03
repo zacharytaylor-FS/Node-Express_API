@@ -83,7 +83,7 @@ router.post('/add', (req, res, next) => {
       res.status(501).json({
         error: {
           message: err.message,
-          stauts: err.status
+          status: err.status
         }
       })
     })

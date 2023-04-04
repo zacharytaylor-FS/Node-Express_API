@@ -10,7 +10,7 @@ beforeAll(async () => {
 })
 
 describe('Customer Test Suite', () => {
-  test('As a user I want to create and account', async () => {
+  test('As a user I want to create a new account', async () => {
     const customer = new Customer({
       "name":"Zachary Taylor",
       "orderCount": 23,

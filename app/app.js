@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cors = require('cors');
 const customerRouter = require('../api/routes/customers')
+const productRouter = require('../api/routes/products')
 const {connect, disconnect, saveUser} = require('../db/db')
 
 require('dotenv').config();
@@ -32,7 +33,7 @@ app.get('/', (req,res,next) => {
 
 //* routes - ROUTER(s)
 app.use('/customers', customerRouter)
-// app.use('/products', productRouter)
+app.use('/products', productRouter)
 
 //* middleware to handle ERRORS and bad url
 app.use((req, res, next) => {

@@ -8,15 +8,19 @@ const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
   _customerId: mongoose.Schema.Types.ObjectId,
-  fName:{
+  first_name:{
     type: String,
     required: true,
     lowercase: true
   },
-  lName:{
+  last_name:{
     type: String,
     required: true,
     lowercase: true
+  },
+  date_of_birth: {
+    type: Number,
+    required: true
   },
   address: {
     type: String
@@ -25,18 +29,26 @@ const customerSchema = new mongoose.Schema({
     type: String
   },
   zipcode: {
-    type: Number
+    type: Number,
+    default: 11111
   },
-  phone: {
-    type: String
-  },
-  orderCount:{
+  // phone: {
+  //   type: String,
+  //   default: 222-333-3333,
+  //   validate: {
+  //     validator: function(num) {
+  //       return /\d{3}-\d{3}-\d{4}/.test(v)
+  //     }
+  //   }
+  // },
+  ordered_products:[{
     type: Number,
     max: 100
-  },
+  }],
   email: {
     type: String,
-    lowercase: true
+    lowercase: true,
+    default: 'example@example.com'
   },
   age:{
     type: Number,
@@ -47,10 +59,10 @@ const customerSchema = new mongoose.Schema({
     type: Boolean,
     required: true
   },
-  updated: {
+  createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
   });
 
   customerSchema.pre('find', () => {

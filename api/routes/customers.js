@@ -1,7 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { saveEntry } = require('../../db/db');
-const Customer = require('../model/customer')
+const Customer = require('../model/customer');
+const errorTemplate = require('../../templates/errorTemplates');
+const messages = require('../../messages/messages');
+const successTemplate = require('../../templates/successTemplate');
 const router = express.Router();
 
 
@@ -31,7 +34,8 @@ router.get('/', async (req, res, next) => {
 router.get('/:customerId', (req, res, next) => {
   const customerId = req.params.customerId
 
-  Customer.findOne({_id:customerId}).then(result => {
+  Customer.findOne({_id:customerId})
+   .then(result => {
     res.status(200).json({
       message: 'Users - GET by Id',
       customer: result,
@@ -43,49 +47,65 @@ router.get('/:customerId', (req, res, next) => {
     })
     
   })
+  .catch(err => {
+    console.log(err.message);
+    res.status(500).json({
+      error: {
+        message: err.message
+      }
+    })
+  })
 });
+
 //* Create User
 router.post('/add', (req, res, next) => {
-  const name = req.body.name;
-  const orderCount = req.body.orderCount
-  const age = req.body.age;
+  const first_name = req.body.first_name;
+  const last_name = req.body.last_name;
+  const date_of_birth = req.body.date_of_birth;
+  const address = req.body.address
+  const city = req.body.city
+  const zipcode = req.body.zipcode
+  const ordered_products = req.body.ordered_products
   const email = req.body.email;
+  const age = req.body.age;
   const living = req.body.living;
 
+
   const newCustomer = new Customer({
-    // _id: mongoose.Schema.Types.ObjectId,
-    name: name,
-    orderCount: orderCount,
+    _id: mongoose.Schema.Types.ObjectId,
+    first_name: first_name,
+    last_name: last_name,
+    date_of_birth:date_of_birth,
+    address: address,
+    city: city,
+    zipcode: zipcode,
+    ordered_products: ordered_products,
     email: email,
+    age: age,
     living: living,
-    age: age
   });
   
   saveEntry(newCustomer)
     .then(result => {
-      console.log(result)
-      res.status(200).json({
-        message: "Customer Saved",
-        customer: {
-          name: result.name,
-          orderCount: result.orderCount,
-          email: result.email,
-          id: result._id,
-          age: result.age,
-          living: result.living,
-          metadata: {
-            method: req.method,
-            host: req.hostname
-          }
-        }
-      })
+      return successTemplate(res,result, messages.customer_save, 201)
+      // console.log(result)
+      // res.status(200).json({
+      //   message: messages.customer_on_save,
+      //   customer: {
+      //     name: result.name,
+      //     orderCount: result.orderCount,
+      //     email: result.email,
+      //     id: result._id,
+      //     age: result.age,
+      //     living: result.living,
+      //     metadata: {
+      //       method: req.method,
+      //       host: req.hostname
+      //     }
+      //   }
+      // })
     }).catch(err => {
-      res.status(501).json({
-        error: {
-          message: err.message,
-          status: err.status
-        }
-      })
+      return errorTemplate(res, err, messages.customer_unsaved, 500)
     })
 
 });

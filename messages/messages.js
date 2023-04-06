@@ -8,5 +8,6 @@ module.exports = {
     //* Product Messages
     product_saved: "Product Save",
     product_on_save: "Product has been saved to MongoDB",
-    product_unsaved: "Product cannot be saved to MongoDB"
+    product_unsaved: "Product cannot be saved to MongoDB",
+    product_updated: "Product has been updated"
 }

@@ -10,76 +10,168 @@ const router = express.Router();
 
 //* GET ALL - show all products
 router.get('/', (req, res, next) => {
-  res.status(200).json({
-    message: 'Products - GET ALL',
-    method: req.method,
-    Timestamp: new Date().toLocaleTimeString()
+
+  Product.find({})
+  .then(result => {
+    console.log(result)
+    res.status(200).json({
+      result,
+      message: 'Product - GET ALL',
+      method: req.method,
+      Timestamps: Date.now
+    })
   })
+  .catch(err => {
+    console.log(err.message);
+    res.status(500).json({
+      error: {
+        message: err.message,
+        status: err.status
+      }
+    })
+  })
+ 
 });
 
 //* GET Product by Id
 router.get('/:productId', (req, res, next) => {
   const productId = req.params.productId
 
-  Product.findById(productId)
+  Product.findById({_id:productId})
   .then(result =>  {
-    return successTemplate(res, result, messages.product_saved, 201)
-    // res.status(200).json({                
-    //   message: `Products - GET by ID at:' ,${new Date.now}`
-    // })
+    console.log(result)
+    res.status(200).json({                
+      message: `Products - GET by ID at:' ,${Date.now}`,
+      product: result,
+    })
   })
   .catch(err => {
-    return errorTemplate(res, err, messages.product_on_unsaved, 500)
+    console.log(err.message)
+    res.status(500).json({
+      error: {
+        message: err.message
+      }
+    })
+    // return errorTemplate(res, err, messages.product_on_unsaved, 500)
   })                                      
-  res.status(200).json({
-  })
+ 
 });
 //* Create Product
 router.post('/add', (req, res, next) => {
-  const name = req.body.name;
-  const price = req.body.name;
-  const type = req.body.type;
-  const sold = req.body.sold;
-  const manufacture = req.body.manufacture;
-
-  const newProduct = new Product({
-    name: name,
-    price: price,
-    type: type,
-    sold: sold,
-    manufacture: manufacture
-  });
-  
-  saveEntry(newProduct)
-    .then((dbProduct) => {
-      return res.status(201).json({product: dbProduct})
-    }).catch(err => {
-      res.status(501).json({
-        error: {
-          message: err.message,
-          status: err.status
-        }
+  Product.find({
+    name: req.body.name,
+    price: req.body.price,
+    type: req.body.type,
+    sold: req.body.sold,
+    manufacture: req.body.manufacture
+  })
+  .then(result => {
+    console.log(result)
+    if (result.length > 0) {
+      res.status(406).json({
+        message: `${result[0].name} already exist`,
       })
+    } else {
+      
+      const newProduct = new Product({
+        name: req.body.name,
+        price: req.body.price,
+        type: req.body.type,
+        sold: req.body.sold,
+        manufacture: req.body.manufacture
+      });
+
+      saveEntry(newProduct)
+        .then((dbProduct) => {
+          console.log(dbProduct)
+          return res.status(201).json({
+            message: messages.product_saved,
+            product: dbProduct
+          })
+        })
+        .catch(err => {
+          res.status(500).json({
+            error: {
+              message: err.message,
+              status: err.status
+            }
+          })
+        })
+    }
+  })
+  .catch(err => {
+    console.log(err.message)
+    res.status(500).json({
+      error: {
+        message: err.message
+      }
     })
+  })
+  
 
 });
 
-router.put('/update/:id', (req, res, next) => {
- const id = req.params.id
+router.put('/update/:productId', (req, res, next) => {
+ const productId = req.params.productId
+
+ const updatedProduct = {
+  _id: productId,
+  name: req.body.name,
+  price: req.body.price,
+  type: req.body.type,
+  manufacture: req.body.manufacture
+ }
+
+ Product.updateOne({
+  _id:productId
+ },{
+  $set: updatedProduct
+ })
+ .then(result => {
   res.status(200).json({
-    id:id,
-    message: 'Users - GET by Id',
-    method: req.method,
-    Timestamp: new Date().toLocaleTimeString()
+    message: messages.product_updated,
+    product: {
+      name: result.name,
+      price: result.price,
+      type: result.type,
+      manufacture: result.manufacture
+    },
+    metadata: {
+      host: req.hostname,
+      method: req.method,
+      Timestamp: new Date().toLocaleTimeString(),
+    }
   })
+ })
+ .catch(err => {
+  res.status(500).json({
+    error: {
+      message: err.message,
+      status: err.status
+    }
+  })
+ })
 })
-router.delete('/:id', (req, res, next) => {
- const id = req.params.id
-  res.status(200).json({
-    id:id,
-    message: 'Users - DELETE by Id',
-    method: req.method,
-    Timestamp: new Date().toLocaleTimeString()
+
+router.delete('/:productId', (req, res, next) => {
+  const productId = req.params.productId
+ 
+  Product.deleteOne({
+    _id:authorId
+  })
+  .exec()
+  .then(result => {
+    res.status(200).json({
+      id:id,
+      message: 'Users - DELETE by Id',
+      method: req.method,
+      Timestamp: new Date().toLocaleTimeString()
+    })
+    
+  })
+  .catch(err => {
+    console.log(err.message);
+
   })
 })
 

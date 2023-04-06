@@ -1,47 +1,12 @@
 const mongoose = require('mongoose');
 
-//? ADD Order to customer Schema
-// const orderSchema = new Schema({
-//   _orderId: mongoose.Types.ObjectId,
-
-// })
-
 const customerSchema = new mongoose.Schema({
-  _customerId: mongoose.Schema.Types.ObjectId,
-  first_name:{
+  _id: mongoose.Schema.Types.ObjectId,
+  name:{
     type: String,
     required: true,
-    lowercase: true
   },
-  last_name:{
-    type: String,
-    required: true,
-    lowercase: true
-  },
-  date_of_birth: {
-    type: Number,
-    required: true
-  },
-  address: {
-    type: String
-  },
-  city: {
-    type: String
-  },
-  zipcode: {
-    type: Number,
-    default: 11111
-  },
-  // phone: {
-  //   type: String,
-  //   default: 222-333-3333,
-  //   validate: {
-  //     validator: function(num) {
-  //       return /\d{3}-\d{3}-\d{4}/.test(v)
-  //     }
-  //   }
-  // },
-  ordered_products:[{
+  orderCount:[{
     type: Number,
     max: 100
   }],
@@ -57,22 +22,18 @@ const customerSchema = new mongoose.Schema({
   },
   living: {
     type: Boolean,
-    required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
+    // required: true
+  }
   });
 
-  customerSchema.pre('find', () => {
-    console.log(this instanceof mongoose.Query);
-    return this.start = Date.now()
-  });
+  // customerSchema.pre('find', () => {
+  //   console.log(this instanceof mongoose.Query);
+  //   return this.start = Date.now()
+  // });
 
-  customerSchema.post('find', (result) => {
-    console.log('find() returned ' + JSON.stringify(result))
-    console.log('find() took ' + (Date.now() - this.start) + 'milliseconds')
-  })
+  // customerSchema.post('find', (result) => {
+  //   console.log('find() returned ' + JSON.stringify(result))
+  //   console.log('find() took ' + (Date.now() - this.start) + 'milliseconds')
+  // })
 
   module.exports = mongoose.model('Customer', customerSchema)

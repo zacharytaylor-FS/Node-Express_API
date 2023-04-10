@@ -30,3 +30,16 @@ describe('Customer Test Suite', () => {
       return await disconnect()
     })  
 });
+
+describe('Product Test Suite', () => {
+  test('As a user I want to show Add a product', async () => {
+    const product = new Product({
+      "name":"",
+      "price":245,
+      "type":"",
+      "manufacture":""
+    })
+
+    const newProduct = await saveEntry(product)
+  })
+})

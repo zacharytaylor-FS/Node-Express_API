@@ -7,7 +7,7 @@ const connect = async (req,res) => {
 const saveEntry = async (newEntry) => {
   console.log('MOCKED - Saving New Entry');
   return Promise.resolve({
-    "name":"Zachary Taylor",
+      "name":"Zachary Taylor",
       "email": "example@example.com",
       "age": 30,
       "living": true

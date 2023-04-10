@@ -12,14 +12,19 @@ const router = express.Router();
 //* GET ALL - show all users
 router.get('/', (req, res, next) => {
 
-   Customer.find({})
+   Customer.find()
+   .select("-__v")
+   .exec()
   .then(users => {
     console.log(users);
     res.status(200).json({
-      users,
+      count: users.length,
+      customer: users,
       message: 'Users - GET ALL',
-      method: req.method,
-      Timestamp: new Date().toLocaleTimeString()
+      metadata: {
+        method: req.method,
+        host: req.hostname,
+      }
     })
   }).catch(err => {
     res.status(500).json({
@@ -58,69 +63,126 @@ router.get('/:customerId', (req, res, next) => {
 });
 
 //* Create User
-router.post('/add', (req, res, next) => {
+// router.post('/', (req, res, next) => {
+//   Customer.find({
+//     name: req.body.name,
+//     orderCount: req.body.orderCount,
+//     email: req.body.email,
+//     age: req.body.age,
+//     living: req.body.living
+//   })
+//   .then(result => {
+//     console.log(result)
+//     if(result.length > 0) {
+//       res.status(406).json({
+//         message: `${result[0].name}, already has an account.`
+//       })
+//     }else {
+
+//       const newCustomer = new Customer({
+//         _id: new mongoose.Types.ObjectId(),
+//         name: req.body.name,
+//         orderCount: req.body.orderCount,
+//         email: req.body.email,
+//         age: req.body.age,
+//         living: req.body.living,
+//       })
+       
+//         saveEntry(newCustomer)
+//           .then(result => {
+//             console.log(result)
+//             res.status(201).json({
+//               message: messages.customer_on_save,
+//               customer: {
+//                 id: result._id,
+//                 name: result.name,
+//                 orderCount: result.orderCount,
+//                 email: result.email,
+//                 age: result.age,
+//                 living: result.living,
+//               },
+//                 metadata: {
+//                   method: req.method,
+//                   host: req.hostname
+//                 }
+//             })
+//           }).catch(err => {
+//             res.status(500).json({
+//               error: {
+//                 message: err.message,
+//                 status: err.status,
+//               }
+//             })
+//           })
+//       }
+//   })
+//   .catch(err => {
+//     console.log(err.message);
+//     res.status(501).json({
+//       error: {
+//         message: err.message
+//       }
+//     })
+//   })
+// });
+
+router.post("/", (req, res, next) => {
+
   Customer.find({
+    product: req.body.product,
+    name: req.body.name,
+  })
+  .select('name _id')
+  .populate("product","name")
+  .exec()
+  .then(result => {
+    if(result.length > 0) {
+      return res.status(400).json({
+        message: `${result[0].name}, ${messages.customer_has_account}`,
+      })
+    }
+  })
+  const newCustomer = new Customer({
+    _id: new  mongoose.Types.ObjectId(),
     name: req.body.name,
     orderCount: req.body.orderCount,
-    email: req.body.email,
     age: req.body.age,
-    living: req.body.living
+    living: req.body.living,
+    product: req.body.product
   })
+
+  newCustomer.save()
   .then(result => {
     console.log(result)
-    if(result.length > 0) {
-      res.status(406).json({
-        message: `${result[0].name}, already has an account.`
-      })
-    }else {
-
-      const newCustomer = new Customer({
-        name: req.body.name,
-        orderCount: req.body.orderCount,
-        email: req.body.email,
-        age: req.body.age,
-        living: req.body.living,
-      })
-       
-        saveEntry(newCustomer)
-          .then(result => {
-            console.log(result)
-            res.status(201).json({
-              message: messages.customer_on_save,
-              customer: {
-                id: result._id,
-                name: result.name,
-                orderCount: result.orderCount,
-                email: result.email,
-                age: result.age,
-                living: result.living,
-              },
-                metadata: {
-                  method: req.method,
-                  host: req.hostname
-                }
-            })
-          }).catch(err => {
-            res.status(500).json({
-              error: {
-                message: err.message,
-                status: err.status,
-              }
-            })
-          })
+    res.status(200).json({
+      message: messages.customer_saved,
+      customer: {
+        id: result._id,
+        name: result.name,
+        orderCount: result.orderCount,
+        email: result.email,
+        age: result.age,
+        living: result.living,
+        product: result.product,
+      metadata: {
+        host: req.hostname,
+        method: req.method,
+        timestamp: Date.now
       }
+      }
+    })
   })
   .catch(err => {
     console.log(err.message);
-    res.status(501).json({
+    res.status(500).json({
       error: {
         message: err.message
       }
     })
   })
-});
+})
 
-router.patch('/update/:customerId', (req, res, next) => {
+router.patch('/:customerId', (req, res, next) => {
  const customerId = req.params.customerId
 
  const updatedCustomer = {
@@ -130,6 +192,7 @@ router.patch('/update/:customerId', (req, res, next) => {
   email: req.body.email,
   age: req.body.age,
   living: req.body.living,
+  product: req.body.product
  }
 
  Customer.updateOne({
@@ -138,7 +201,7 @@ router.patch('/update/:customerId', (req, res, next) => {
   $set: updatedCustomer
 }).then(result => {
   res.status(200).json({
-    message: "Updated Customer",
+    message: messages.customer_updated,
     customer: {
       name: result.name,
       orderCount: result.orderCount,
@@ -146,11 +209,11 @@ router.patch('/update/:customerId', (req, res, next) => {
       id: result._id,
       age: result.age,
       living: result.living,
-    },
-    metadata: {
-      host: req.hostname,
-      method: req.method,
-      Timestamp: new Date().toLocaleTimeString(),
+      product: result.product,
+      metadata: {
+        host: req.hostname,
+        method: req.method,
+      }
     }
   })
 })
@@ -164,13 +227,13 @@ router.patch('/update/:customerId', (req, res, next) => {
 });
 })
 
-router.delete('/delete/:customerId', (req, res, next) => {
+router.delete('/:customerId', (req, res, next) => {
   const customerId = req.params.customerId
 
 Customer.deleteOne({_id:customerId})
   .then(result => {
     res.status(200).json({
-      message: "Delete Customer",
+      message: messages.customer_delete,
       success: {result},
       metadata: {
         host: req.hostname,

@@ -1,6 +1,6 @@
 const successTemplate = (res, result, message, status) => {
     return res.status(status).json({
-        message: messages.customer_save,
+        message: message,
         customer: result,
         status: status
       });

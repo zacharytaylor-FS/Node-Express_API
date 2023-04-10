@@ -11,14 +11,19 @@ const router = express.Router();
 //* GET ALL - show all products
 router.get('/', (req, res, next) => {
 
-  Product.find({})
+  Product.find()
+  .select("-__v")
+  .exec()
   .then(result => {
     console.log(result)
     res.status(200).json({
-      result,
+      count: result.length,
+      product: result,
       message: 'Product - GET ALL',
-      method: req.method,
-      Timestamps: Date.now
+      metadata: {
+        method: req.method,
+        host: req.hostname
+      }
     })
   })
   .catch(err => {
@@ -41,7 +46,7 @@ router.get('/:productId', (req, res, next) => {
   .then(result =>  {
     console.log(result)
     res.status(200).json({                
-      message: `Products - GET by ID at:' ,${Date.now}`,
+      message: messages.product_getById,
       product: result,
     })
   })
@@ -57,7 +62,7 @@ router.get('/:productId', (req, res, next) => {
  
 });
 //* Create Product
-router.post('/add', (req, res, next) => {
+router.post('/', (req, res, next) => {
   Product.find({
     name: req.body.name,
     price: req.body.price,
@@ -66,14 +71,16 @@ router.post('/add', (req, res, next) => {
     manufacture: req.body.manufacture
   })
   .then(result => {
-    console.log(result)
+    // console.log(result)
     if (result.length > 0) {
       res.status(406).json({
-        message: `${result[0].name} already exist`,
+        message: `${result[0].name} ${messages.product_exist}`,
+        
       })
     } else {
       
       const newProduct = new Product({
+        _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         price: req.body.price,
         type: req.body.type,
@@ -82,11 +89,11 @@ router.post('/add', (req, res, next) => {
       });
 
       saveEntry(newProduct)
-        .then((dbProduct) => {
-          console.log(dbProduct)
+        .then((result) => {
+          // console.log(dbProduct)
           return res.status(201).json({
             message: messages.product_saved,
-            product: dbProduct
+            product: result
           })
         })
         .catch(err => {
@@ -111,7 +118,7 @@ router.post('/add', (req, res, next) => {
 
 });
 
-router.put('/update/:productId', (req, res, next) => {
+router.patch('/:productId', (req, res, next) => {
  const productId = req.params.productId
 
  const updatedProduct = {
@@ -157,15 +164,16 @@ router.delete('/:productId', (req, res, next) => {
   const productId = req.params.productId
  
   Product.deleteOne({
-    _id:authorId
+    _id:productId
   })
   .exec()
   .then(result => {
     res.status(200).json({
-      id:id,
       message: 'Users - DELETE by Id',
-      method: req.method,
-      Timestamp: new Date().toLocaleTimeString()
+      request: {
+        method: 'GET',
+        url: 'http://localhost:80/products/' + productId
+      },
     })
     
   })

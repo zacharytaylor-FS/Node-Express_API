@@ -1,7 +1,8 @@
+const { Decimal128 } = require('mongodb');
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
-  product_id: mongoose.Types.ObjectId,
+  _id: mongoose.Schema.Types.ObjectId,
   name: {
     type: String,
     required: true,
